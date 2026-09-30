@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>{{ ujian.judul }} - CBT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="max-w-4xl mx-auto p-6">
+  <div class="bg-white rounded-xl shadow p-6 mb-4 flex justify-between items-center sticky top-4 z-30">
+    <div>
+      <h1 class="text-xl font-bold">{{ ujian.judul }}</h1>
+      <p class="text-sm text-gray-500">{{ ujian.mapel }} • {{ soal_list|length }} soal</p>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-gray-500">Sisa Waktu</p>
+      <p id="timer" class="text-2xl font-bold text-red-600">--:--</p>
+    </div>
+  </div>
+
+  <form method="POST" id="formCbt" class="space-y-4"
+      data-confirm="Yakin ingin menyelesaikan ujian?&#10;Jawaban yang sudah dikirim tidak bisa diubah lagi."
+      data-confirm-type="warning"
+      data-confirm-title="Konfirmasi Selesai"
+      data-confirm-ok="Ya, Kirim Jawaban">
+    {% for s in soal_list %}
+      <div class="bg-white rounded-xl shadow p-6">
+        <p class="font-semibold mb-3">{{ loop.index }}. {{ s.pertanyaan }}</p>
+        <div class="space-y-2">
+          {% for label, key in [('A','a'),('B','b'),('C','c'),('D','d')] %}
+            <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer">
+              <input type="radio" name="jawaban_{{ s.id }}" value="{{ label }}">
+              <span><b>{{ label }}.</b> {{ s['opsi_' + key] }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+    <button type="submit"
+          class="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 shadow transition">
+    <i class="fas fa-paper-plane mr-2"></i>Selesai & Kirim Jawaban
+  </button>
+  </form>
+</div>
+
+<script>
+  let sisa = {{ ujian.durasi }} * 60;
+  const timerEl = document.getElementById('timer');
+  function tick() {
+    const m = String(Math.floor(sisa / 60)).padStart(2, '0');
+    const s = String(sisa % 60).padStart(2, '0');
+    timerEl.textContent = m + ':' + s;
+    if (sisa-- <= 0) document.getElementById('formCbt').submit();
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+{% include '_dialog.html' %}   <!-- ⬅️ TAMBAHKAN -->
+</body>
+</html>

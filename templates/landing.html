@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="bg-white/90 backdrop-blur shadow-sm sticky top-0 z-50 -m-6 mb-0 border-b border-green-200">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="/" class="text-2xl font-bold text-green-700 flex items-center">
+      <i class="fas fa-leaf mr-2"></i>CBT Online
+    </a>
+    <div class="flex items-center gap-2">
+      <a href="{{ url_for('login_siswa') }}"
+         class="px-4 md:px-5 py-2 text-green-700 border-2 border-green-600 rounded-lg hover:bg-green-50 font-semibold transition text-sm md:text-base">
+        <i class="fas fa-user-graduate mr-1"></i>
+        <span class="hidden sm:inline">Login </span>Siswa
+      </a>
+      <a href="{{ url_for('login') }}"
+         class="px-4 md:px-5 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 shadow-md transition text-sm md:text-base">
+        <i class="fas fa-user-shield mr-1"></i>
+        <span class="hidden sm:inline">Admin / </span>Guru
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO SECTION — SLIDESHOW 5 GAMBAR + BADGE STATISTIK
+     ============================================================ -->
+<section class="bg-gradient-to-br from-green-600 via-emerald-600 to-green-800 text-white -mx-6 relative overflow-hidden">
+
+  <!-- Ornamen daun background -->
+  <i class="fas fa-leaf absolute -top-4 -right-8 text-[20rem] text-white/5 rotate-12 pointer-events-none"></i>
+  <i class="fas fa-seedling absolute bottom-4 left-4 text-[8rem] text-white/5 -rotate-12 pointer-events-none"></i>
+
+  <div class="max-w-7xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
+
+    <!-- ============ KOLOM KIRI: TEKS ============ -->
+    <div>
+      <span class="inline-block px-3 py-1 bg-lime-400/30 text-lime-100 rounded-full text-sm mb-4 backdrop-blur">
+        🌱 Platform Ujian Modern
+      </span>
+      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
+        Platform Ujian Berbasis Komputer yang <span class="text-lime-300">Segar & Modern</span>
+      </h1>
+      <p class="text-lg text-green-50 mb-8 leading-relaxed">
+        Kelola ujian, soal, siswa, dan guru dalam satu aplikasi terintegrasi.
+        Cepat, aman, dan efisien untuk semua kebutuhan evaluasi pembelajaran.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="{{ url_for('login_siswa') }}"
+           class="inline-block px-8 py-3 bg-lime-400 text-green-900 font-semibold rounded-lg shadow-lg hover:bg-lime-300 hover:scale-105 transition">
+          <i class="fas fa-play-circle mr-2"></i>Mulai Ujian Sekarang
+        </a>
+        <a href="{{ url_for('login') }}"
+           class="inline-block px-8 py-3 bg-white/20 backdrop-blur text-white font-semibold rounded-lg hover:bg-white/30 border border-white/30 transition">
+          <i class="fas fa-cog mr-2"></i>Panel Admin
+        </a>
+      </div>
+
+      <!-- Trust indicators -->
+      <div class="flex flex-wrap items-center gap-6 mt-8 text-sm text-green-100">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-check-circle text-lime-300"></i>
+          <span>Gratis & Open Source</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fas fa-check-circle text-lime-300"></i>
+          <span>Anti-Nyontek</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ KOLOM KANAN: SLIDESHOW ============ -->
+    <div class="relative">
+      <div id="heroSlideshow"
+           class="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20 bg-gradient-to-br from-green-400/30 to-emerald-700/30 backdrop-blur group">
+
+        <!-- Slide 1 -->
+        <div class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100" data-slide="0">
+          <img src="{{ url_for('static', filename='img/slide/slide1.jpeg') }}"
+               alt="Ujian Online"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';">
+          <div class="slide-fallback absolute inset-0 hidden items-center justify-center flex-col text-white text-center p-6 bg-gradient-to-br from-green-500 to-emerald-700">
+            <i class="fas fa-laptop-code text-7xl mb-4 opacity-90"></i>
+            <p class="text-xl font-bold">Ujian Berbasis Komputer</p>
+            <p class="text-sm opacity-80 mt-1">Modern & Terintegrasi</p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16 pointer-events-none">
+            <p class="font-bold text-lg">Ujian Online Interaktif</p>
+            <p class="text-xs text-white/80">Kerjakan ujian kapan saja, di mana saja</p>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="1">
+          <img src="{{ url_for('static', filename='img/slide/slide2.jpeg') }}"
+               alt="Bank Soal"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';">
+          <div class="slide-fallback absolute inset-0 hidden items-center justify-center flex-col text-white text-center p-6 bg-gradient-to-br from-emerald-500 to-teal-700">
+            <i class="fas fa-question-circle text-7xl mb-4 opacity-90"></i>
+            <p class="text-xl font-bold">Bank Soal Lengkap</p>
+            <p class="text-sm opacity-80 mt-1">Support gambar & acak otomatis</p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16 pointer-events-none">
+            <p class="font-bold text-lg">Bank Soal Terstruktur</p>
+            <p class="text-xs text-white/80">Import massal via Excel</p>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="2">
+          <img src="{{ url_for('static', filename='img/slide/slide3.jpeg') }}"
+               alt="Timer Otomatis"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';">
+          <div class="slide-fallback absolute inset-0 hidden items-center justify-center flex-col text-white text-center p-6 bg-gradient-to-br from-lime-500 to-green-700">
+            <i class="fas fa-clock text-7xl mb-4 opacity-90"></i>
+            <p class="text-xl font-bold">Timer Otomatis</p>
+            <p class="text-sm opacity-80 mt-1">Auto-submit saat waktu habis</p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16 pointer-events-none">
+            <p class="font-bold text-lg">Manajemen Waktu Presisi</p>
+            <p class="text-xs text-white/80">Sisa waktu tampil real-time</p>
+          </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="3">
+          <img src="{{ url_for('static', filename='img/slide/slide4.jpeg') }}"
+               alt="Hasil Instan"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';">
+          <div class="slide-fallback absolute inset-0 hidden items-center justify-center flex-col text-white text-center p-6 bg-gradient-to-br from-green-600 to-emerald-800">
+            <i class="fas fa-chart-line text-7xl mb-4 opacity-90"></i>
+            <p class="text-xl font-bold">Hasil Instan</p>
+            <p class="text-sm opacity-80 mt-1">Nilai & review jawaban langsung</p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16 pointer-events-none">
+            <p class="font-bold text-lg">Analisis Hasil Otomatis</p>
+            <p class="text-xs text-white/80">Langsung tahu benar & salah</p>
+          </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="4">
+          <img src="{{ url_for('static', filename='img/slide/slide5.jpeg') }}"
+               alt="Anti Nyontek"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';">
+          <div class="slide-fallback absolute inset-0 hidden items-center justify-center flex-col text-white text-center p-6 bg-gradient-to-br from-teal-500 to-emerald-700">
+            <i class="fas fa-shield-alt text-7xl mb-4 opacity-90"></i>
+            <p class="text-xl font-bold">Anti Nyontek</p>
+            <p class="text-sm opacity-80 mt-1">Soal & opsi diacak per siswa</p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-16 pointer-events-none">
+            <p class="font-bold text-lg">Randomisasi Cerdas</p>
+            <p class="text-xs text-white/80">Urutan unik untuk setiap siswa</p>
+          </div>
+        </div>
+
+        <!-- Tombol Prev -->
+        <button id="heroPrev" type="button" aria-label="Slide sebelumnya"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100 focus:opacity-100 z-20">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <!-- Tombol Next -->
+        <button id="heroNext" type="button" aria-label="Slide berikutnya"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100 focus:opacity-100 z-20">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Indikator Dots -->
+        <div id="heroDots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20"></div>
+      </div>
+
+      <!-- ⚡ BADGE STATISTIK DINAMIS (sebelah kanan slide) -->
+		<div class="absolute top-1/2 -translate-y-1/2 -right-4 md:-right-6 bg-white rounded-2xl shadow-2xl px-5 py-4 border border-green-100 animate-bounce-slow min-w-[220px] z-20">
+		  <p class="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-2">
+			<i class="fas fa-chart-simple mr-1 text-green-600"></i>Data Terkini
+		  </p>
+		  <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+			<div>
+			  <p class="text-[10px] text-gray-500 leading-tight">Siswa</p>
+			  <p class="text-lg font-bold text-green-800 leading-tight">{{ stats.siswa }}</p>
+			</div>
+			<div>
+			  <p class="text-[10px] text-gray-500 leading-tight">Guru</p>
+			  <p class="text-lg font-bold text-emerald-700 leading-tight">{{ stats.guru }}</p>
+			</div>
+			<div>
+			  <p class="text-[10px] text-gray-500 leading-tight">Soal</p>
+			  <p class="text-lg font-bold text-lime-700 leading-tight">{{ stats.soal }}</p>
+			</div>
+			<div>
+			  <p class="text-[10px] text-gray-500 leading-tight">Ujian</p>
+			  <p class="text-lg font-bold text-orange-600 leading-tight">{{ stats.ujian }}</p>
+			</div>
+		  </div>
+		</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION STATISTIK — 4 KARTU BESAR
+     ============================================================ -->
+<section class="max-w-7xl mx-auto py-16 -mx-6">
+  <div class="text-center mb-10">
+    <h2 class="text-2xl md:text-3xl font-bold text-green-800">
+      <i class="fas fa-chart-line mr-2 text-green-600"></i>Statistik Platform
+    </h2>
+    <p class="text-green-600 mt-2 text-sm">Data real-time dari sistem</p>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+    {% set stat_cards = [
+      ('fa-user-graduate', stats.siswa, 'Siswa Terdaftar', 'from-green-500 to-emerald-600', 'text-green-800'),
+      ('fa-chalkboard-teacher', stats.guru, 'Guru Pengajar', 'from-emerald-500 to-teal-600', 'text-emerald-800'),
+      ('fa-question-circle', stats.soal, 'Soal Tersedia', 'from-lime-500 to-green-600', 'text-lime-800'),
+      ('fa-file-alt', stats.ujian, 'Ujian Aktif', 'from-orange-500 to-red-500', 'text-orange-700'),
+    ] %}
+    {% for icon, value, label, color, text_color in stat_cards %}
+      <div class="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition p-6 border border-green-100 text-center">
+        <div class="w-14 h-14 mx-auto bg-gradient-to-br {{ color }} text-white rounded-xl flex items-center justify-center shadow-lg mb-3">
+          <i class="fas {{ icon }} text-xl"></i>
+        </div>
+        <p class="text-3xl md:text-4xl font-extrabold {{ text_color }}">{{ value }}</p>
+        <p class="text-xs text-gray-500 mt-1 uppercase tracking-wider font-semibold">{{ label }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION FITUR UNGGULAN
+     ============================================================ -->
+<section class="max-w-7xl mx-auto py-16 -mx-6">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl font-bold text-green-800">Fitur Unggulan</h2>
+    <p class="text-green-600 mt-2">Semua yang Anda butuhkan untuk ujian online</p>
+  </div>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% set fitur = [
+      ('fa-user-graduate','Manajemen Siswa','Kelola data siswa, kelas, dan akun login dengan mudah.'),
+      ('fa-chalkboard-teacher','Manajemen Guru','Atur data guru beserta mata pelajaran yang diampu.'),
+      ('fa-question-circle','Bank Soal','Simpan dan kelola soal pilihan ganda dengan cepat.'),
+      ('fa-file-alt','Kelola Ujian','Buat jadwal ujian, atur durasi, dan pilih soal.'),
+      ('fa-clock','Timer Otomatis','Waktu ujian berjalan otomatis dengan auto-submit.'),
+      ('fa-chart-line','Hasil Instan','Nilai langsung muncul setelah ujian selesai.'),
+      ('fa-file-excel','Import Excel','Upload soal massal dari template Excel dengan mudah.'),
+      ('fa-image','Support Gambar','Soal & opsi jawaban bisa menyertakan gambar.'),
+      ('fa-random','Randomisasi','Acak urutan soal & opsi jawaban per siswa.'),
+    ] %}
+    {% for icon, title, desc in fitur %}
+      <div class="bg-white p-6 md:p-8 rounded-xl shadow-md hover:shadow-2xl hover:-translate-y-1 transition border border-green-100">
+        <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 text-white flex items-center justify-center rounded-lg mb-4 shadow">
+          <i class="fas {{ icon }} text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2 text-green-800">{{ title }}</h3>
+        <p class="text-gray-600 leading-relaxed">{{ desc }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION CARA KERJA
+     ============================================================ -->
+<section class="bg-white -mx-6 py-16 border-y border-green-100">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-green-800">Cara Kerja</h2>
+      <p class="text-green-600 mt-2">Hanya 3 langkah mudah</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 relative">
+      {% set steps = [
+        ('1', 'fa-user-plus', 'Login Siswa', 'Siswa login dengan NIS untuk mulai mengerjakan ujian.'),
+        ('2', 'fa-pen-fancy', 'Kerjakan Ujian', 'Soal tampil otomatis dengan timer real-time & auto-save.'),
+        ('3', 'fa-award', 'Lihat Hasil', 'Nilai muncul instan lengkap dengan review jawaban.'),
+      ] %}
+      {% for no, icon, title, desc in steps %}
+        <div class="text-center relative">
+          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-xl mb-4 relative">
+            <i class="fas {{ icon }} text-white text-2xl"></i>
+            <span class="absolute -top-1 -right-1 w-7 h-7 bg-lime-400 text-green-900 rounded-full flex items-center justify-center text-xs font-bold border-2 border-white">
+              {{ no }}
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-green-800 mb-2">{{ title }}</h3>
+          <p class="text-gray-600 text-sm max-w-xs mx-auto">{{ desc }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA SECTION
+     ============================================================ -->
+<section class="max-w-7xl mx-auto py-16 -mx-6">
+  <div class="bg-gradient-to-br from-green-600 via-emerald-600 to-green-800 rounded-3xl p-8 md:p-12 text-white text-center relative overflow-hidden shadow-2xl">
+    <i class="fas fa-leaf absolute -top-4 -right-4 text-[12rem] text-white/5 rotate-12"></i>
+    <i class="fas fa-seedling absolute -bottom-4 -left-4 text-[8rem] text-white/5 -rotate-12"></i>
+
+    <div class="relative z-10 max-w-2xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Siap Memulai Ujian Online?</h2>
+      <p class="text-green-100 mb-8">Login sekarang dan rasakan pengalaman ujian berbasis komputer yang modern & menyenangkan.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="{{ url_for('login_siswa') }}"
+           class="inline-block px-8 py-3 bg-lime-400 text-green-900 font-semibold rounded-lg shadow-lg hover:bg-lime-300 hover:scale-105 transition">
+          <i class="fas fa-play-circle mr-2"></i>Login Siswa
+        </a>
+        <a href="{{ url_for('login') }}"
+           class="inline-block px-8 py-3 bg-white/20 backdrop-blur text-white font-semibold rounded-lg hover:bg-white/30 border border-white/30 transition">
+          <i class="fas fa-user-shield mr-2"></i>Login Admin / Guru
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="bg-gradient-to-r from-green-800 to-emerald-900 text-white -mx-6 mt-12">
+  <div class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
+    <div>
+      <h3 class="text-xl font-bold text-lime-300 mb-3">
+        <i class="fas fa-leaf mr-2"></i>CBT Online
+      </h3>
+      <p class="text-sm text-green-100 leading-relaxed">
+        Platform ujian berbasis komputer modern untuk sekolah, kampus, dan lembaga pendidikan.
+      </p>
+    </div>
+    <div>
+      <h4 class="font-bold text-lime-300 mb-3">Menu Cepat</h4>
+      <ul class="space-y-2 text-sm text-green-100">
+        <li><a href="{{ url_for('landing') }}" class="hover:text-lime-300 transition"><i class="fas fa-angle-right mr-2"></i>Home</a></li>
+        <li><a href="{{ url_for('login_siswa') }}" class="hover:text-lime-300 transition"><i class="fas fa-angle-right mr-2"></i>Login Siswa</a></li>
+        <li><a href="{{ url_for('login') }}" class="hover:text-lime-300 transition"><i class="fas fa-angle-right mr-2"></i>Login Admin / Guru</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold text-lime-300 mb-3">Kontak</h4>
+      <ul class="space-y-2 text-sm text-green-100">
+        <li><i class="fas fa-envelope mr-2"></i>admin@cbt-online.id</li>
+        <li><i class="fas fa-phone mr-2"></i>(021) 1234-5678</li>
+        <li><i class="fas fa-map-marker-alt mr-2"></i>Jakarta, Indonesia</li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-green-700/50 py-5 text-center text-sm text-green-100">
+    <p>
+      <i class="fas fa-leaf mr-2 text-lime-300"></i>
+      &copy; 2025 CBT Online. Powered by <span class="text-lime-300 font-semibold">Flask</span>.
+    </p>
+  </div>
+</footer>
+
+<!-- ============================================================
+     STYLE UNTUK SLIDESHOW
+     ============================================================ -->
+<style>
+  /* Fallback: tampilkan jika gambar error */
+  .hero-slide img[style*="display: none"] + .slide-fallback,
+  .hero-slide img[style*="display:none"] + .slide-fallback {
+    display: flex !important;
+  }
+
+  /* Animasi bounce lembut untuk badge */
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 3s ease-in-out infinite;
+  }
+
+  /* Dot indicator */
+  .hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: rgba(255,255,255,0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+  }
+  .hero-dot:hover {
+    background-color: rgba(255,255,255,0.8);
+    transform: scale(1.2);
+  }
+  .hero-dot.active {
+    background-color: #a3e635;
+    width: 28px;
+    box-shadow: 0 0 12px rgba(163, 230, 53, 0.6);
+  }
+
+  /* Mobile: sembunyikan tombol prev/next */
+  @media (max-width: 640px) {
+    #heroPrev, #heroNext { display: none; }
+  }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+</style>
+
+<!-- ============================================================
+     SCRIPT UNTUK SLIDESHOW
+     ============================================================ -->
+<script>
+(function () {
+  const slideshow = document.getElementById('heroSlideshow');
+  if (!slideshow) return;
+
+  const slides   = slideshow.querySelectorAll('.hero-slide');
+  const dotsWrap = document.getElementById('heroDots');
+  const prevBtn  = document.getElementById('heroPrev');
+  const nextBtn  = document.getElementById('heroNext');
+
+  const TOTAL_DURATION = 4500; // ms per slide
+  let currentIndex = 0;
+  let autoTimer = null;
+  let isPaused = false;
+
+  /* Buat dots indicator */
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', () => {
+      goTo(i);
+      restartAuto();
+    });
+    dotsWrap.appendChild(dot);
+  });
+  const dots = dotsWrap.querySelectorAll('.hero-dot');
+
+  /* Fungsi pindah slide */
+  function goTo(index) {
+    if (index < 0) index = slides.length - 1;
+    if (index >= slides.length) index = 0;
+
+    slides.forEach((s, i) => {
+      s.style.opacity       = (i === index) ? '1' : '0';
+      s.style.zIndex        = (i === index) ? '10' : '1';
+      s.style.pointerEvents = (i === index) ? 'auto' : 'none';
+    });
+
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === index);
+    });
+
+    currentIndex = index;
+  }
+
+  function next() { goTo(currentIndex + 1); }
+  function prev() { goTo(currentIndex - 1); }
+
+  function startAuto() {
+    stopAuto();
+    if (isPaused) return;
+    autoTimer = setInterval(next, TOTAL_DURATION);
+  }
+  function stopAuto() {
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = null;
+  }
+  function restartAuto() { startAuto(); }
+
+  /* Event listeners */
+  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAuto(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAuto(); });
+
+  // Pause saat hover
+  slideshow.addEventListener('mouseenter', () => { isPaused = true;  stopAuto(); });
+  slideshow.addEventListener('mouseleave', () => { isPaused = false; startAuto(); });
+
+  // Pause saat tab tidak aktif
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAuto();
+    else if (!isPaused) startAuto();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const rect = slideshow.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (!inView) return;
+    if (e.key === 'ArrowLeft')  { prev(); restartAuto(); }
+    if (e.key === 'ArrowRight') { next(); restartAuto(); }
+  });
+
+  // Swipe support (mobile)
+  let touchStartX = 0;
+  let touchEndX = 0;
+  slideshow.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  slideshow.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) next();
+      else prev();
+      restartAuto();
+    }
+  }, { passive: true });
+
+  /* Init */
+  goTo(0);
+  startAuto();
+})();
+</script>
+
+{% endblock %}

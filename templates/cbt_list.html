@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Daftar Ujian Aktif</h1>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% if not data %}
+    <div class="col-span-full bg-white rounded-xl shadow p-8 text-center text-gray-500">
+      Belum ada ujian aktif.
+    </div>
+  {% endif %}
+  {% for u in data %}
+    <div class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+      <div class="flex items-start justify-between mb-3">
+        <i class="fas fa-file-alt text-blue-600 text-3xl"></i>
+        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Aktif</span>
+      </div>
+      <h3 class="font-bold text-lg mb-1">{{ u.judul }}</h3>
+      <p class="text-sm text-gray-500 mb-1">{{ u.mapel }}</p>
+      <p class="text-sm text-gray-500 mb-1">Kelas: {{ u.nama_kelas or '-' }}</p>
+      <p class="text-sm text-gray-500 mb-4">Durasi: {{ u.durasi }} menit</p>
+      <a href="{{ url_for('cbt_form', ujian_id=u.id) }}"
+		   data-confirm="Mulai ujian '{{ u.judul }}' sekarang?&#10;Waktu {{ u.durasi }} menit akan mulai berjalan dan tidak bisa dihentikan."
+		   data-confirm-type="question"
+		   data-confirm-title="Mulai Ujian"
+		   data-confirm-ok="Ya, Mulai"
+		   class="block text-center py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 shadow transition">
+		  <i class="fas fa-play-circle mr-1"></i>Mulai Ujian <i class="fas fa-arrow-right ml-1"></i>
+		</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

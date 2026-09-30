@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Hasil Ujian - {{ hasil.judul }}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<nav class="bg-gradient-to-r from-green-700 to-emerald-800 text-white shadow-lg">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-leaf text-lime-300 text-2xl"></i>
+      <h1 class="font-bold">Hasil Ujian</h1>
+    </div>
+    <a href="{{ url_for('siswa_dashboard') }}"
+       class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition">
+      <i class="fas fa-arrow-left mr-1"></i>Dashboard
+    </a>
+  </div>
+</nav>
+
+<div class="max-w-5xl mx-auto px-6 py-8">
+
+  <!-- Kartu Hasil -->
+  <div class="bg-white rounded-2xl shadow-xl p-8 text-center mb-6 border-t-4 border-lime-400 relative overflow-hidden">
+    <i class="fas fa-leaf absolute -top-6 -right-6 text-[10rem] text-green-100 rotate-12"></i>
+
+    <div class="relative z-10">
+      {% set nilai = hasil.nilai %}
+      {% set warna = 'from-green-500 to-emerald-600' if nilai >= 75 else 
+                      ('from-lime-500 to-green-600' if nilai >= 60 else 
+                      ('from-yellow-500 to-orange-500' if nilai >= 40 else 'from-red-500 to-rose-600')) %}
+      {% set ikon = 'fa-trophy' if nilai >= 75 else 
+                    ('fa-thumbs-up' if nilai >= 60 else 
+                    ('fa-meh' if nilai >= 40 else 'fa-frown')) %}
+      {% set pesan = 'Luar Biasa!' if nilai >= 75 else 
+                     ('Bagus!' if nilai >= 60 else 
+                     ('Cukup Baik' if nilai >= 40 else 'Perlu Belajar Lagi')) %}
+
+      <div class="w-24 h-24 mx-auto bg-gradient-to-br {{ warna }} rounded-full flex items-center justify-center shadow-lg mb-4">
+        <i class="fas {{ ikon }} text-white text-4xl"></i>
+      </div>
+
+      <h1 class="text-2xl font-bold text-green-800 mb-1">{{ pesan }}</h1>
+      <p class="text-gray-500 mb-1">{{ hasil.judul }}</p>
+      <p class="text-xs text-gray-400 mb-4">
+        {{ hasil.mapel }} • Kelas {{ hasil.nama_kelas or '-' }}
+      </p>
+
+      <div class="inline-block px-8 py-4 bg-gradient-to-r {{ warna }} text-white rounded-2xl shadow-lg mb-6">
+        <p class="text-xs uppercase tracking-wider opacity-80">Nilai Anda</p>
+        <p class="text-5xl font-extrabold">{{ hasil.nilai }}</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+        <div class="bg-green-50 p-3 rounded-xl border border-green-200">
+          <i class="fas fa-check-circle text-green-600 text-xl"></i>
+          <p class="text-xs text-gray-500 mt-1">Benar</p>
+          <p class="text-xl font-bold text-green-700">{{ hasil.benar }}</p>
+        </div>
+        <div class="bg-red-50 p-3 rounded-xl border border-red-200">
+          <i class="fas fa-times-circle text-red-600 text-xl"></i>
+          <p class="text-xs text-gray-500 mt-1">Salah</p>
+          <p class="text-xl font-bold text-red-700">{{ hasil.salah }}</p>
+        </div>
+        <div class="bg-lime-50 p-3 rounded-xl border border-lime-200">
+          <i class="fas fa-star text-lime-600 text-xl"></i>
+          <p class="text-xs text-gray-500 mt-1">Total</p>
+          <p class="text-xl font-bold text-lime-700">{{ hasil.benar + hasil.salah }}</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-400 mt-6">
+        <i class="fas fa-clock mr-1"></i>Selesai: {{ hasil.waktu_selesai.strftime('%d %b %Y %H:%M') if hasil.waktu_selesai else '-' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Review Jawaban -->
+  <div class="space-y-4">
+	 {% for d in detail %}
+		  <div class="border-l-4 rounded-lg p-4 bg-white shadow-sm
+			{% if d.opsi | selectattr('dipilih') | selectattr('adalah_jawaban') | list %}border-green-500
+			{% else %}border-red-500{% endif %}">
+			<div class="flex items-start gap-3 mb-3">
+			  <span class="w-7 h-7 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+				{{ loop.index }}
+			  </span>
+			  <div class="flex-1">
+				<p class="font-medium text-gray-800 text-sm">{{ d.pertanyaan }}</p>
+				{% if d.gambar_url %}
+				  <img src="{{ url_for('static', filename=d.gambar_url) }}"
+					   class="max-h-40 rounded border mt-2"
+					   onerror="this.style.display='none'">
+				{% endif %}
+			  </div>
+			</div>
+
+			<div class="ml-10 space-y-1 text-sm">
+			  {% for o in d.opsi %}
+				<div class="flex items-start gap-2 px-3 py-2 rounded-lg
+				  {% if o.adalah_jawaban %}bg-green-100 border border-green-400
+				  {% elif o.dipilih %}bg-red-100 border border-red-400
+				  {% else %}bg-gray-50{% endif %}">
+				  <b class="w-5 text-gray-700">{{ o.label }}.</b>
+				  <span class="flex-1">
+					{{ o.teks }}
+					{% if o.gambar_url %}
+					  <img src="{{ url_for('static', filename=o.gambar_url) }}"
+						   class="max-h-24 rounded border mt-1"
+						   onerror="this.style.display='none'">
+					{% endif %}
+				  </span>
+				  {% if o.adalah_jawaban %}
+					<span class="text-xs text-green-700 font-semibold whitespace-nowrap">
+					  <i class="fas fa-check"></i> Benar
+					</span>
+				  {% endif %}
+				  {% if o.dipilih %}
+					<span class="text-xs {{ 'text-green-700' if o.adalah_jawaban else 'text-red-700' }} font-semibold whitespace-nowrap">
+					  <i class="fas {{ 'fa-star' if o.adalah_jawaban else 'fa-times' }}"></i> Pilihan Anda
+					</span>
+				  {% endif %}
+				</div>
+			  {% endfor %}
+			</div>
+		  </div>
+	 {% endfor %}
+  </div>
+  <div class="mt-6 text-center">
+    <a href="{{ url_for('siswa_dashboard') }}"
+       class="inline-block px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 shadow transition">
+      <i class="fas fa-arrow-left mr-2"></i>Kembali ke Dashboard
+    </a>
+  </div>
+</div>
+</body>
+{% include '_dialog.html' %}   <!-- opsional -->
+</html>

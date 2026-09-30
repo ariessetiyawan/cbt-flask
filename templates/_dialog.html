@@ -1,0 +1,201 @@
+<!-- ============================================================
+     CUSTOM DIALOG MODAL — Tema Hijau Daun
+     API:
+       cbtDialog.alert(msg, type, title)
+       cbtDialog.confirm(msg, { type, title, okText, cancelText })
+       cbtDialog.delete(msg, title)
+     Type: info | success | warning | error | question | danger
+     ============================================================ -->
+
+<div id="cbtModal"
+     class="fixed inset-0 z-[100] hidden items-center justify-center p-4"
+     style="background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+
+  <div id="cbtModalContent"
+       class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border-t-4 border-lime-400 relative">
+    <i class="fas fa-leaf absolute -top-4 -right-4 text-[6rem] text-green-100/60 rotate-12 pointer-events-none"></i>
+
+    <div class="p-6 text-center relative z-10">
+      <div id="cbtModalIcon"
+           class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white text-4xl shadow-lg"></div>
+      <h3 id="cbtModalTitle"
+          class="text-xl font-bold text-green-800 mb-2">Konfirmasi</h3>
+      <p id="cbtModalMessage"
+         class="text-gray-600 text-sm whitespace-pre-line leading-relaxed"></p>
+    </div>
+
+    <div class="bg-gray-50 px-6 py-4 flex gap-3 justify-end border-t border-gray-100">
+      <button id="cbtModalCancel" type="button"
+              class="px-5 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 font-semibold transition">
+        <i class="fas fa-times mr-1"></i><span id="cbtModalCancelText">Batal</span>
+      </button>
+      <button id="cbtModalOk" type="button"
+              class="px-5 py-2.5 rounded-lg text-white font-semibold transition shadow-md">
+        <i class="fas fa-check mr-1"></i><span id="cbtModalOkText">OK</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes cbtModalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(-24px); }
+    to   { opacity: 1; transform: scale(1)   translateY(0); }
+  }
+  @keyframes cbtModalFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  #cbtModal.flex { animation: cbtModalFade 0.15s ease-out; }
+  #cbtModal.flex #cbtModalContent { animation: cbtModalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+</style>
+
+<script>
+window.cbtDialog = (function () {
+  const modal     = document.getElementById('cbtModal');
+  const icon      = document.getElementById('cbtModalIcon');
+  const titleEl   = document.getElementById('cbtModalTitle');
+  const messageEl = document.getElementById('cbtModalMessage');
+  const okBtn     = document.getElementById('cbtModalOk');
+  const cancelBtn = document.getElementById('cbtModalCancel');
+  const okTextEl  = document.getElementById('cbtModalOkText');
+  const cancelTextEl = document.getElementById('cbtModalCancelText');
+
+  let resolvePromise = null;
+
+  const TYPES = {
+    info:     { icon: 'fa-info-circle',         bg: 'bg-gradient-to-br from-sky-400 to-blue-600',       title: 'Informasi',         btn: 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700' },
+    success:  { icon: 'fa-check-circle',        bg: 'bg-gradient-to-br from-green-400 to-emerald-600',  title: 'Berhasil',          btn: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' },
+    warning:  { icon: 'fa-exclamation-triangle',bg: 'bg-gradient-to-br from-amber-400 to-orange-500',   title: 'Perhatian',         btn: 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700' },
+    error:    { icon: 'fa-times-circle',        bg: 'bg-gradient-to-br from-red-400 to-rose-600',       title: 'Terjadi Kesalahan', btn: 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700' },
+    question: { icon: 'fa-question-circle',     bg: 'bg-gradient-to-br from-lime-400 to-green-600',     title: 'Konfirmasi',        btn: 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' },
+    danger:   { icon: 'fa-trash-alt',           bg: 'bg-gradient-to-br from-red-500 to-rose-700',       title: 'Konfirmasi Hapus',  btn: 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700' },
+  };
+
+  function show(opts) {
+    return new Promise(resolve => {
+      resolvePromise = resolve;
+      const t = TYPES[opts.type] || TYPES.info;
+
+      icon.className = 'w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 text-white text-4xl shadow-lg ' + t.bg;
+      icon.innerHTML = '<i class="fas ' + t.icon + '"></i>';
+
+      titleEl.textContent   = opts.title   || t.title;
+      messageEl.textContent = opts.message || '';
+
+      okBtn.className     = 'px-5 py-2.5 rounded-lg text-white font-semibold transition shadow-md ' + t.btn;
+      okTextEl.textContent = opts.okText || 'OK';
+
+      const needsCancel = ['question', 'danger', 'warning'].includes(opts.type);
+      cancelBtn.style.display = needsCancel ? '' : 'none';
+      cancelTextEl.textContent = opts.cancelText || 'Batal';
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(() => okBtn.focus(), 80);
+    });
+  }
+
+  function hide() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  function done(val) {
+    hide();
+    const r = resolvePromise;
+    resolvePromise = null;
+    if (r) r(val);
+  }
+
+  okBtn.addEventListener('click', () => done(true));
+  cancelBtn.addEventListener('click', () => done(false));
+  modal.addEventListener('click', e => { if (e.target === modal) done(false); });
+  document.addEventListener('keydown', e => {
+    if (modal.classList.contains('hidden')) return;
+    if (e.key === 'Escape') done(false);
+    if (e.key === 'Enter')  done(true);
+  });
+
+  return {
+    alert:   (message, type = 'info', title) =>
+      show({ message, type, title, okText: 'Mengerti' }),
+
+    confirm: (message, options = {}) =>
+      show({
+        message,
+        type:       options.type   || 'question',
+        title:      options.title,
+        okText:     options.okText || 'Ya, Lanjutkan',
+        cancelText: options.cancelText || 'Batal',
+      }),
+
+    delete: (message, title) =>
+      show({
+        message,
+        type:  'danger',
+        title: title || 'Konfirmasi Hapus',
+        okText: 'Ya, Hapus',
+        cancelText: 'Batal',
+      }),
+  };
+})();
+
+/* ============================================================
+   GLOBAL AUTO-HANDLERS
+   Cukup tambahkan atribut data-confirm di tag manapun.
+   ============================================================ */
+
+/* 1) Link / button dengan data-confirm */
+document.addEventListener('click', function (e) {
+  const el = e.target.closest('a[data-confirm], button[data-confirm]');
+  if (!el) return;
+  e.preventDefault();
+
+  const msg    = el.dataset.confirm;
+  const type   = el.dataset.confirmType || 'question';
+  const okText = el.dataset.confirmOk;
+  const title  = el.dataset.confirmTitle;
+
+  const promise = (type === 'danger')
+    ? cbtDialog.delete(msg, title)
+    : cbtDialog.confirm(msg, { type, okText, title });
+
+  promise.then(ok => {
+    if (!ok) return;
+    if (el.tagName === 'A' && el.href) {
+      window.location.href = el.href;
+    } else if (el.form) {
+      el.form.dataset.confirmed = '1';
+      el.form.requestSubmit ? el.form.requestSubmit() : el.form.submit();
+    }
+  });
+});
+
+/* 2) Form dengan data-confirm */
+document.addEventListener('submit', function (e) {
+  const form = e.target;
+  if (!form.dataset.confirm) return;
+
+  if (form.dataset.confirmed === '1') {
+    form.dataset.confirmed = '0';
+    return; // lanjut submit
+  }
+
+  e.preventDefault();
+  const msg    = form.dataset.confirm;
+  const type   = form.dataset.confirmType || 'question';
+  const okText = form.dataset.confirmOk;
+  const title  = form.dataset.confirmTitle;
+
+  cbtDialog.confirm(msg, { type, okText, title }).then(ok => {
+    if (!ok) return;
+    form.dataset.confirmed = '1';
+    if (form.requestSubmit) form.requestSubmit();
+    else form.submit();
+  });
+});
+</script>

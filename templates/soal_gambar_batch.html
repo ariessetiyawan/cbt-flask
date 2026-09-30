@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-green-800">
+    <i class="fas fa-images mr-2 text-green-600"></i>Upload Gambar Batch
+  </h1>
+  <p class="text-sm text-gray-500 mt-1">
+    {{ soal_list|length }} soal berhasil diimport. Upload gambar untuk setiap soal di bawah.
+  </p>
+</div>
+
+<div class="bg-lime-50 border border-lime-200 rounded-lg p-4 mb-6 text-sm text-green-900">
+  <p class="font-semibold mb-1"><i class="fas fa-info-circle mr-1"></i>Cara pakai:</p>
+  <ol class="list-decimal list-inside space-y-1 text-xs">
+    <li>Isi nama file di kolom gambar soal (sudah dari Excel).</li>
+    <li>Upload file gambar ke setiap soal sesuai nama yang diisi.</li>
+    <li>File akan otomatis masuk ke folder unik masing-masing soal.</li>
+  </ol>
+</div>
+
+<div class="space-y-4">
+  {% for s in soal_list %}
+    <div class="bg-white rounded-xl shadow-md p-5 border-l-4 {{ 'border-green-500' if s.files else 'border-orange-400' }}">
+      <div class="flex justify-between items-start mb-3 flex-wrap gap-2">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">#{{ s.id }}</span>
+            <code class="text-[10px] bg-lime-100 text-green-800 px-2 py-0.5 rounded">{{ s.folder }}</code>
+            {% if s.files %}
+              <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                <i class="fas fa-check-circle"></i> {{ s.files|length }} gambar
+              </span>
+            {% else %}
+              <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                <i class="fas fa-exclamation-circle"></i> belum ada gambar
+              </span>
+            {% endif %}
+          </div>
+          <p class="text-sm font-medium text-green-900">{{ s.pertanyaan }}</p>
+
+          <!-- Kolom gambar yang direferensikan -->
+          {% set refs = [] %}
+          {% if s.gambar %}{% set _ = refs.append(('soal', s.gambar)) %}{% endif %}
+          {% if s.gambar_a %}{% set _ = refs.append(('A', s.gambar_a)) %}{% endif %}
+          {% if s.gambar_b %}{% set _ = refs.append(('B', s.gambar_b)) %}{% endif %}
+          {% if s.gambar_c %}{% set _ = refs.append(('C', s.gambar_c)) %}{% endif %}
+          {% if s.gambar_d %}{% set _ = refs.append(('D', s.gambar_d)) %}{% endif %}
+
+          {% if refs %}
+            <div class="mt-2 text-xs">
+              <span class="text-gray-500">File yang dibutuhkan:</span>
+              <div class="flex flex-wrap gap-1 mt-1">
+                {% for label, fname in refs %}
+                  {% set ada = fname in s.files %}
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono
+                    {{ 'bg-green-100 text-green-700' if ada else 'bg-red-100 text-red-700' }}">
+                    <i class="fas {{ 'fa-check' if ada else 'fa-times' }} mr-1"></i>
+                    [{{ label }}] {{ fname }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Form upload per soal -->
+        <form method="POST" action="{{ url_for('soal_gambar_quick', soal_id=s.id) }}"
+              enctype="multipart/form-data"
+              class="flex items-center gap-2 flex-shrink-0">
+          <input type="hidden" name="back_ids" value="{{ soal_list | map(attribute='id') | join(',') }}">
+          <input type="file" name="gambar_files" accept="image/*" multiple
+                 class="text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0
+                        file:bg-green-600 file:text-white file:text-xs hover:file:bg-green-700">
+          <button type="submit"
+                  class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs hover:bg-green-700 whitespace-nowrap">
+            <i class="fas fa-upload"></i> Upload
+          </button>
+        </form>
+      </div>
+
+      <!-- Preview gambar yang sudah ada -->
+      {% if s.files %}
+        <div class="flex flex-wrap gap-2 mt-2 pt-3 border-t border-green-100">
+          {% for f in s.files %}
+            <div class="relative group">
+              <img src="{{ url_for('static', filename='uploads/soal/' + s.folder + '/' + f) }}"
+                   class="w-16 h-16 object-cover rounded-lg border-2 border-green-200">
+              <p class="text-[9px] truncate max-w-[64px] text-center mt-0.5 font-mono" title="{{ f }}">{{ f }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<div class="mt-6 flex gap-2 justify-end">
+  <a href="{{ url_for('soal') }}"
+     class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+    <i class="fas fa-check mr-1"></i>Selesai & Lihat Bank Soal
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Data Ujian</h1>
+<div class="grid lg:grid-cols-2 gap-6">
+  <div class="bg-white rounded-xl shadow p-6">
+    <h2 class="font-bold mb-4">{{ 'Edit' if edit else 'Buat' }} Ujian</h2>
+    <form method="POST" class="space-y-3">
+      <input type="hidden" name="id" value="{{ edit.id if edit else '' }}">
+      <div><label class="block text-sm mb-1">Judul Ujian</label>
+        <input type="text" name="judul" required value="{{ edit.judul if edit else '' }}"
+               class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-sm mb-1">Mata Pelajaran</label>
+        <input type="text" name="mapel" value="{{ edit.mapel if edit else '' }}"
+               class="w-full px-3 py-2 border rounded-lg"></div>
+      <div><label class="block text-sm mb-1">Kelas</label>
+        <select name="kelas_id" required class="w-full px-3 py-2 border rounded-lg">
+          <option value="">-- Pilih --</option>
+          {% for k in kelas_list %}
+            <option value="{{ k.id }}" {{ 'selected' if edit and edit.kelas_id==k.id }}>{{ k.nama_kelas }}</option>
+          {% endfor %}
+        </select></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-sm mb-1">Durasi (menit)</label>
+          <input type="number" name="durasi" value="{{ edit.durasi if edit else 60 }}"
+                 class="w-full px-3 py-2 border rounded-lg"></div>
+        <div><label class="block text-sm mb-1">Tanggal</label>
+          <input type="date" name="tanggal" value="{{ edit.tanggal if edit else '' }}"
+                 class="w-full px-3 py-2 border rounded-lg"></div>
+      </div>
+      <div><label class="block text-sm mb-1">Status</label>
+        <select name="status" class="w-full px-3 py-2 border rounded-lg">
+          <option value="aktif" {{ 'selected' if edit and edit.status=='aktif' }}>Aktif</option>
+          <option value="nonaktif" {{ 'selected' if edit and edit.status=='nonaktif' }}>Nonaktif</option>
+        </select></div>
+
+      <div>
+        <label class="block text-sm mb-1">Pilih Soal ({{ soal_list|length }} tersedia)</label>
+        <div class="border rounded-lg p-3 max-h-60 overflow-y-auto space-y-1 text-sm">
+          {% for s in soal_list %}
+            <label class="flex items-start gap-2 hover:bg-gray-50 p-1 rounded">
+              <input type="checkbox" name="soal_ids" value="{{ s.id }}"
+                     {{ 'checked' if s.id in selected_soal }} class="mt-1">
+              <span>{{ s.pertanyaan[:80] }}{{ '...' if s.pertanyaan|length > 80 }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+	  <div class="bg-lime-50 border border-lime-200 rounded-lg p-3 space-y-2">
+		  <label class="flex items-center gap-2 cursor-pointer text-sm">
+			<input type="checkbox" name="shuffle_soal" value="1"
+				   {{ 'checked' if not edit or edit.shuffle_soal }}
+				   class="accent-green-600 w-4 h-4">
+			<span><i class="fas fa-random text-green-600 mr-1"></i>Acak urutan soal per siswa</span>
+		  </label>
+		  <label class="flex items-center gap-2 cursor-pointer text-sm">
+			<input type="checkbox" name="shuffle_opsi" value="1"
+				   {{ 'checked' if not edit or edit.shuffle_opsi }}
+				   class="accent-green-600 w-4 h-4">
+			<span><i class="fas fa-shuffle text-green-600 mr-1"></i>Acak urutan opsi jawaban</span>
+		  </label>
+		</div>
+      <button class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        {{ 'Update' if edit else 'Simpan' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <h2 class="font-bold mb-4">Daftar Ujian</h2>
+    <table class="w-full text-sm">
+      <thead class="bg-gray-100 text-left">
+        <tr><th class="p-3">Judul</th><th class="p-3">Kelas</th>
+            <th class="p-3">Soal</th><th class="p-3">Durasi</th><th class="p-3">Aksi</th></tr>
+      </thead>
+      <tbody>
+        {% for r in data %}
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-3">{{ r.judul }}</td>
+            <td class="p-3">{{ r.nama_kelas or '-' }}</td>
+            <td class="p-3">{{ r.jml_soal }}</td>
+            <td class="p-3">{{ r.durasi }}m</td>
+            <td class="p-3 space-x-2">
+              <a href="{{ url_for('ujian', edit=r.id) }}" class="text-blue-600"><i class="fas fa-edit"></i></a>
+			  <a href="{{ url_for('ujian_hapus', id=r.id) }}"
+			   data-confirm="Yakin ingin menghapus ujian '{{ r.judul }}'?&#10;Semua hasil ujian siswa akan ikut terhapus."
+			   data-confirm-type="danger"
+			   data-confirm-title="Hapus Ujian"
+			   class="text-red-600 hover:text-red-800 transition"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

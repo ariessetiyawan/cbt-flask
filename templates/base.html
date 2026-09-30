@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>{{ title or 'CBT App' }} - CBT Online</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+</style>
+</head>
+<body class="font-sans min-h-screen">
 
+{% if current_user %}
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-green-800 to-emerald-900 text-white shadow-2xl z-40 overflow-y-auto">
+  <div class="p-5 border-b border-green-700/50">
+    <h1 class="text-xl font-bold text-lime-300">
+      <i class="fas fa-leaf mr-2"></i>CBT App
+    </h1>
+    <p class="text-xs text-green-200 mt-1">Hi, {{ current_user }} ({{ current_role }})</p>
+  </div>
+  <nav class="p-3 space-y-1 text-sm">
+    {% set menus = [
+      ('dashboard','Dashboard','fa-home'),
+      ('kelas','Data Kelas','fa-door-open'),
+      ('siswa','Data Siswa','fa-user-graduate'),
+      ('guru','Data Guru','fa-chalkboard-teacher'),
+      ('soal','Data Soal','fa-question-circle'),
+      ('ujian','Data Ujian','fa-file-alt'),
+      ('cbt_list','Mulai CBT','fa-play-circle'),
+    ] %}
+    {% for endpoint, label, icon in menus %}
+      <a href="{{ url_for(endpoint) }}"
+         class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition
+         {{ 'bg-green-600 shadow-lg' if active_page == endpoint else 'hover:bg-green-700/60' }}">
+        <i class="fas {{ icon }} w-5"></i> {{ label }}
+      </a>
+    {% endfor %}
+    <a href="{{ url_for('logout') }}"
+       class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-red-600 mt-4 transition">
+      <i class="fas fa-sign-out-alt w-5"></i> Logout
+    </a>
+  </nav>
+</aside>
+<main class="ml-64 p-6">
+{% else %}
+<main class="p-6">
+{% endif %}
+
+  <!-- Flash message -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <div class="mb-4 p-3 rounded-lg text-sm shadow
+          {{ 'bg-green-100 text-green-800 border border-green-300' if category=='success' else 'bg-red-100 text-red-700 border border-red-300' }}">
+          <i class="fas {{ 'fa-check-circle' if category=='success' else 'fa-exclamation-circle' }} mr-2"></i>{{ msg }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+
+{% include '_dialog.html' %}  
+
+</body>
+</html>
+</body>
+</html>

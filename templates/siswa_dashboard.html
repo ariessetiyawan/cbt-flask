@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Siswa - CBT Online</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Navbar Siswa -->
+<nav class="bg-gradient-to-r from-green-700 to-emerald-800 text-white shadow-lg sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <i class="fas fa-leaf text-lime-300 text-2xl"></i>
+      <div>
+        <h1 class="font-bold">CBT Online - Siswa</h1>
+        <p class="text-xs text-green-200">{{ session.siswa_nama }} • Kelas {{ session.siswa_kelas or '-' }}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="hidden md:inline-block text-xs bg-white/10 px-3 py-1 rounded-full">
+        <i class="fas fa-clock mr-1"></i><span id="clock">--:--:--</span>
+      </span>
+      <a href="{{ url_for('siswa_logout') }}"
+         class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-sm transition">
+        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+  <!-- Flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, msg in messages %}
+      <div class="mb-4 p-3 rounded-lg text-sm shadow border
+        {{ 'bg-green-100 text-green-800 border-green-300' if category=='success' else 'bg-red-100 text-red-700 border-red-300' }}">
+        <i class="fas {{ 'fa-check-circle' if category=='success' else 'fa-exclamation-circle' }} mr-2"></i>{{ msg }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Sapaan -->
+  <div class="bg-gradient-to-r from-green-600 to-emerald-700 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+    <i class="fas fa-book-reader absolute right-4 top-2 text-[6rem] text-white/10"></i>
+    <h2 class="text-2xl font-bold relative z-10">Halo, {{ session.siswa_nama }}! 👋</h2>
+    <p class="text-green-100 mt-1 relative z-10">Selamat datang di portal ujian online. Kerjakan ujian dengan jujur dan teliti.</p>
+  </div>
+
+  <!-- Statistik -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-green-500">
+      <p class="text-xs text-gray-500"><i class="fas fa-file-alt mr-1 text-green-600"></i>Total Ujian</p>
+      <p class="text-2xl font-bold text-green-700">{{ stats.total_ujian }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-lime-500">
+      <p class="text-xs text-gray-500"><i class="fas fa-play-circle mr-1 text-lime-600"></i>Tersedia</p>
+      <p class="text-2xl font-bold text-lime-700">{{ stats.tersedia }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-orange-500">
+      <p class="text-xs text-gray-500"><i class="fas fa-hourglass-half mr-1 text-orange-600"></i>Berlangsung</p>
+      <p class="text-2xl font-bold text-orange-600">{{ stats.berlangsung }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 border-l-4 border-emerald-500">
+      <p class="text-xs text-gray-500"><i class="fas fa-check-double mr-1 text-emerald-600"></i>Selesai</p>
+      <p class="text-2xl font-bold text-emerald-700">{{ stats.selesai }}</p>
+    </div>
+  </div>
+
+  <!-- Daftar Ujian -->
+  <h2 class="text-xl font-bold text-green-800 mb-4">
+    <i class="fas fa-list mr-2"></i>Daftar Ujian Anda
+  </h2>
+
+  {% if not ujian_list %}
+    <div class="bg-white rounded-xl shadow p-10 text-center">
+      <i class="fas fa-inbox text-6xl text-green-200 mb-4"></i>
+      <p class="text-gray-500">Belum ada ujian tersedia untuk kelas Anda.</p>
+    </div>
+  {% else %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for u in ujian_list %}
+        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden border-t-4
+          {% if u.hasil_selesai_id %}border-emerald-500
+          {% elif u.hasil_berlangsung_id %}border-orange-500
+          {% else %}border-green-500{% endif %}">
+
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-lg flex items-center justify-center shadow">
+                <i class="fas fa-file-alt text-xl"></i>
+              </div>
+              {% if u.hasil_selesai_id %}
+                <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-semibold">
+                  <i class="fas fa-check"></i> Selesai
+                </span>
+              {% elif u.hasil_berlangsung_id %}
+                <span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-semibold animate-pulse">
+                  <i class="fas fa-hourglass-half"></i> Berlangsung
+                </span>
+              {% else %}
+                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">
+                  <i class="fas fa-circle text-[6px]"></i> Tersedia
+                </span>
+              {% endif %}
+            </div>
+
+            <h3 class="font-bold text-lg mb-1 text-green-900">{{ u.judul }}</h3>
+            <p class="text-sm text-gray-500 mb-3">
+              <i class="fas fa-book mr-1 text-green-600"></i>{{ u.mapel or '-' }}
+            </p>
+
+            <div class="text-xs text-gray-600 space-y-1 mb-4 bg-green-50 rounded-lg p-3">
+              <p><i class="fas fa-list-ol mr-2 text-green-600"></i>{{ u.jml_soal }} soal</p>
+              <p><i class="fas fa-clock mr-2 text-green-600"></i>Durasi {{ u.durasi }} menit</p>
+              <p><i class="fas fa-calendar mr-2 text-green-600"></i>{{ u.tanggal }}</p>
+            </div>
+
+            {% if u.hasil_selesai_id %}
+              <a href="{{ url_for('siswa_hasil', hasil_id=u.hasil_selesai_id) }}"
+                 class="block text-center py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition">
+                <i class="fas fa-eye mr-1"></i>Lihat Hasil
+              </a>
+            {% elif u.hasil_berlangsung_id %}
+              <a href="{{ url_for('siswa_ujian', ujian_id=u.id) }}"
+				   data-confirm="Lanjutkan ujian '{{ u.judul }}'?&#10;Timer sudah berjalan sejak sesi terakhir."
+				   data-confirm-type="warning"
+				   data-confirm-title="Lanjutkan Ujian"
+				   data-confirm-ok="Ya, Lanjutkan"
+				   class="block text-center py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition">
+				  <i class="fas fa-play mr-1"></i>Lanjutkan Ujian
+				</a>
+            {% else %}
+              <a href="{{ url_for('siswa_ujian_start', ujian_id=u.id) }}"
+				   data-confirm="Mulai ujian '{{ u.judul }}'?&#10;Waktu {{ u.durasi }} menit akan mulai berjalan dan tidak bisa dihentikan.&#10;&#10;Pastikan Anda sudah siap!"
+				   data-confirm-type="question"
+				   data-confirm-title="Mulai Ujian"
+				   data-confirm-ok="Ya, Mulai Sekarang"
+				   class="block text-center py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 shadow transition">
+				  <i class="fas fa-play-circle mr-1"></i>Mulai Ujian
+				</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="mt-10 text-center text-xs text-gray-500">
+    <i class="fas fa-leaf text-green-500 mr-1"></i>
+    CBT Online &copy; 2025 — Sistem Ujian Berbasis Komputer
+  </div>
+</div>
+
+<script>
+  // Jam realtime
+  function updateClock() {
+    const d = new Date();
+    const t = [d.getHours(), d.getMinutes(), d.getSeconds()]
+      .map(x => String(x).padStart(2, '0')).join(':');
+    document.getElementById('clock').textContent = t;
+  }
+  updateClock(); setInterval(updateClock, 1000);
+</script>
+{% include '_dialog.html' %}   <!-- ⬅️ TAMBAHKAN -->
+</body>
+</html>

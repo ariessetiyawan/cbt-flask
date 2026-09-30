@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold text-green-800">
+    <i class="fas fa-question-circle mr-2 text-green-600"></i>Bank Soal
+  </h1>
+  <a href="{{ url_for('soal_upload') }}"
+     class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 shadow">
+    <i class="fas fa-file-excel mr-1"></i>Import dari Excel
+  </a>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+  <!-- Form manual (sama seperti sebelumnya, tambah input gambar) -->
+  <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500">
+    <h2 class="font-bold mb-4 text-green-800">{{ 'Edit' if edit else 'Tambah' }} Soal Manual</h2>
+    <form method="POST" enctype="multipart/form-data" class="space-y-3">
+      <input type="hidden" name="id" value="{{ edit.id if edit else '' }}">
+      <div>
+        <label class="block text-sm mb-1 text-green-900">Pertanyaan</label>
+        <textarea name="pertanyaan" required rows="3"
+                  class="w-full px-3 py-2 border border-green-300 rounded-lg">{{ edit.pertanyaan if edit else '' }}</textarea>
+      </div>
+
+      {% for o in ['a','b','c','d'] %}
+        <div class="border border-green-100 rounded-lg p-3 bg-green-50/30">
+          <label class="block text-sm mb-1 text-green-900 font-semibold">Opsi {{ o|upper }}</label>
+          <input type="text" name="opsi_{{ o }}" required
+                 value="{{ edit['opsi_' + o] if edit else '' }}"
+                 class="w-full px-3 py-2 border border-green-300 rounded-lg mb-2">
+          <input type="text" name="gambar_{{ o }}" placeholder="Nama file gambar (opsional)"
+                 value="{{ edit['gambar_' + o] if edit else '' }}"
+                 class="w-full px-3 py-1.5 text-sm border border-green-200 rounded-lg">
+        </div>
+      {% endfor %}
+
+      <div>
+        <label class="block text-sm mb-1 text-green-900">Gambar Soal (opsional)</label>
+        <input type="text" name="gambar" placeholder="Nama file gambar utama"
+               value="{{ edit.gambar if edit else '' }}"
+               class="w-full px-3 py-2 border border-green-300 rounded-lg">
+        <p class="text-xs text-gray-500 mt-1">Upload file gambar dulu di menu <a href="{{ url_for('soal_upload') }}" class="text-green-600 underline">Import Excel</a></p>
+      </div>
+
+      <div>
+        <label class="block text-sm mb-1 text-green-900">Jawaban Benar</label>
+        <select name="jawaban" class="w-full px-3 py-2 border border-green-300 rounded-lg">
+          {% for j in ['A','B','C','D'] %}
+            <option value="{{ j }}" {{ 'selected' if edit and edit.jawaban==j }}>{{ j }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="w-full py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg">
+        {{ 'Update' if edit else 'Simpan' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- List soal dengan gambar -->
+  <div class="bg-white rounded-xl shadow-md p-6 max-h-[800px] overflow-y-auto">
+    <h2 class="font-bold mb-4 text-green-800">Daftar Soal ({{ data|length }})</h2>
+    {% for r in data %}
+	  <div class="border border-green-100 rounded-lg p-4 mb-3 hover:bg-green-50/50">
+		<div class="flex justify-between mb-2 flex-wrap gap-2">
+		  <div class="flex items-center gap-2 flex-wrap">
+			<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">#{{ loop.index }}</span>
+			<code class="text-[10px] bg-lime-100 text-green-800 px-2 py-0.5 rounded">{{ r.folder }}</code>
+			<span class="text-[10px] px-1.5 py-0.5 rounded
+			  {{ 'bg-blue-100 text-blue-700' if r.sumber=='excel' else 'bg-gray-100 text-gray-600' }}">
+			  {{ r.sumber }}
+			</span>
+		  </div>
+		  <div class="space-x-2">
+			<a href="{{ url_for('soal_gambar', soal_id=r.id) }}"
+			   class="text-lime-600 hover:text-lime-800" title="Kelola Gambar">
+			  <i class="fas fa-image"></i>
+			</a>
+			<a href="{{ url_for('soal', edit=r.id) }}" class="text-green-600"><i class="fas fa-edit"></i></a>
+			<a href="{{ url_for('siswa_hapus', id=r.id) }}"
+			   data-confirm="Yakin ingin menghapus siswa '{{ r.nama }}' (NIS {{ r.nis }})?&#10;Akun login siswa juga akan dihapus."
+			   data-confirm-type="danger"
+			   class="text-red-600 hover:text-red-800 transition"><i class="fas fa-trash"></i></a>
+					  </div>
+		</div>
+
+		<p class="font-medium mb-2 text-green-900">{{ r.pertanyaan }}</p>
+
+		{% if r.gambar %}
+		  <img src="{{ url_for('static', filename='uploads/soal/' + r.folder + '/' + r.gambar) }}"
+			   class="max-h-40 rounded-lg border border-green-200 mb-2"
+			   onerror="this.style.display='none'">
+		{% endif %}
+
+		<div class="text-sm text-gray-600 space-y-1">
+		  {% for o in ['a','b','c','d'] %}
+			<div class="{{ 'text-green-700 font-semibold bg-green-50 px-2 py-1 rounded' if o|upper==r.jawaban }}">
+			  <b>{{ o|upper }}.</b> {{ r['opsi_' + o] }}
+			  {% if r['gambar_' + o] %}
+				<img src="{{ url_for('static', filename='uploads/soal/' + r.folder + '/' + r['gambar_' + o]) }}"
+					 class="inline-block max-h-16 ml-2 rounded border"
+					 onerror="this.style.display='none'">
+			  {% endif %}
+			  {% if o|upper == r.jawaban %}<i class="fas fa-check ml-1"></i>{% endif %}
+			</div>
+		  {% endfor %}
+		</div>
+	  </div>
+	{% endfor %}
+  </div>
+</div>
+{% endblock %}

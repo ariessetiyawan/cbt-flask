@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>{{ ujian.judul }} - Ujian Berlangsung</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
+  .pilihan:checked + span { font-weight: 600; color: #15803d; }
+  /* Gambar soal: paksa tampil dengan lebar maksimum */
+  .gambar-soal {
+    display: block;
+    max-width: 400px;
+    max-height: 320px;
+    width: auto;
+    height: auto;
+    margin: 12px 0;
+    border-radius: 12px;
+    border: 3px solid #86efac;
+    background: #f9fafb;
+    padding: 4px;
+  }
+  .gambar-opsi {
+    display: block;
+    max-width: 200px;
+    max-height: 150px;
+    width: auto;
+    height: auto;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 2px solid #86efac;
+    background: #f9fafb;
+    padding: 2px;
+  }
+</style>
+</head>
+<body class="min-h-screen pb-32">
+
+<!-- ============ HEADER + TIMER ============ -->
+<div class="bg-gradient-to-r from-green-700 to-emerald-800 text-white shadow-lg sticky top-0 z-40">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-4">
+    <div class="min-w-0">
+      <h1 class="font-bold text-sm md:text-base truncate">
+        <i class="fas fa-file-alt mr-1 text-lime-300"></i>{{ ujian.judul }}
+      </h1>
+      <p class="text-xs text-green-200 truncate">
+        {{ ujian.mapel }} • {{ soal_list|length }} soal • {{ session.siswa_nama }}
+      </p>
+    </div>
+    <div id="timerBox" class="bg-white/10 backdrop-blur px-4 py-2 rounded-xl text-center flex-shrink-0 border-2 border-lime-300/50">
+      <p class="text-[10px] text-green-100 uppercase tracking-wider">Sisa Waktu</p>
+      <p id="timer" class="text-xl md:text-2xl font-bold text-lime-300 font-mono">--:--</p>
+    </div>
+  </div>
+</div>
+
+<!-- Info bar -->
+<div class="bg-lime-100 border-b border-lime-300 py-2 sticky top-[68px] z-30">
+  <div class="max-w-5xl mx-auto px-4 flex justify-between items-center text-xs text-green-800">
+    <span><i class="fas fa-info-circle mr-1"></i>Jawaban otomatis tersimpan. Jangan tutup halaman.</span>
+    <span>Terjawab: <b id="terjawab">0</b>/{{ soal_list|length }}</span>
+  </div>
+</div>
+
+<!-- ============ FORM ============ -->
+<form id="formUjian" method="POST" action="{{ url_for('siswa_ujian', ujian_id=ujian.id) }}" class="max-w-5xl mx-auto px-4 py-6 space-y-5">
+
+  {% for s in soal_list %}
+    {# urutan_opsi = string seperti 'CADB' — mapping label→opsi asli #}
+    {% set urutan = s.urutan_opsi if s.urutan_opsi else 'ABCD' %}
+
+    <div class="bg-white rounded-xl shadow-md p-5 md:p-6 border-l-4 border-green-500" id="soal-{{ s.id }}">
+
+      <!-- Nomor + Pertanyaan -->
+      <div class="flex items-start gap-3 mb-4">
+        <span class="w-9 h-9 bg-gradient-to-br from-green-600 to-emerald-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+          {{ loop.index }}
+        </span>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-green-900 leading-relaxed">{{ s.pertanyaan }}</p>
+
+          {# ===== GAMBAR SOAL ===== #}
+          {% if s.gambar and s.folder %}
+            <img src="{{ url_for('static', filename='uploads/soal/' + s.folder + '/' + s.gambar) }}"
+                 alt="Gambar soal {{ loop.index }}"
+                 class="gambar-soal"
+                 loading="lazy"
+                 onerror="console.error('❌ Gagal load:', this.src); this.style.border='3px solid red'; this.alt='❌ Gambar tidak ditemukan: '+this.src.split('/').pop();">
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Pilihan Jawaban -->
+      <div class="space-y-2">
+        {% for label in ['A', 'B', 'C', 'D'] %}
+          {% set idx = loop.index0 %}
+          {% set key_asli = urutan[idx] | lower %}
+          {% set teks = s['opsi_' + key_asli] %}
+          {% set gmb = s['gambar_' + key_asli] %}
+
+          <label class="flex items-start gap-3 p-3 border-2 rounded-lg cursor-pointer transition
+            {% if jawaban_map.get(s.id) == label %}bg-green-100 border-green-500{% else %}border-green-100 hover:bg-green-50 hover:border-green-400{% endif %}">
+
+            <input type="radio"
+                   name="jawaban_{{ s.id }}"
+                   value="{{ label }}"
+                   data-soal="{{ s.id }}"
+                   class="pilihan accent-green-600 w-4 h-4 mt-1 flex-shrink-0"
+                   {% if jawaban_map.get(s.id) == label %}checked{% endif %}>
+
+            <span class="text-sm md:text-base flex-1 min-w-0">
+              <b class="text-green-700">{{ label }}.</b> {{ teks }}
+
+              {# ===== GAMBAR OPSI ===== #}
+              {% if gmb and s.folder %}
+                <img src="{{ url_for('static', filename='uploads/soal/' + s.folder + '/' + gmb) }}"
+                     alt="Gambar opsi {{ label }}"
+                     class="gambar-opsi"
+                     loading="lazy"
+                     onerror="console.error('❌ Gagal load:', this.src); this.style.border='3px solid red'; this.alt='❌ Gambar opsi tidak ditemukan';">
+              {% endif %}
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+
+    </div>
+  {% endfor %}
+
+</form>
+
+<!-- ============ FOOTER ACTION ============ -->
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-green-200 shadow-2xl py-3 z-40">
+  <div class="max-w-5xl mx-auto px-4 flex justify-between items-center gap-3">
+    <div class="text-xs text-gray-600 hidden md:block">
+      <i class="fas fa-leaf text-green-500 mr-1"></i>
+      Pastikan semua soal sudah dijawab sebelum mengirim.
+    </div>
+    <button type="button" onclick="submitUjian()"
+            class="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 shadow-lg transition">
+      <i class="fas fa-paper-plane mr-2"></i>Selesai & Kirim Jawaban
+    </button>
+  </div>
+</div>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+  // ============ TIMER ============
+  let sisa = {{ sisa_detik }};
+  const timerEl = document.getElementById('timer');
+  const timerBox = document.getElementById('timerBox');
+  let submitted = false;
+
+  function formatTime(sec) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  }
+
+  function updateTimer() {
+    if (submitted) return;
+    timerEl.textContent = formatTime(sisa);
+
+    if (sisa <= 60) {
+      timerBox.classList.add('animate-pulse', 'bg-red-500/30', 'border-red-400');
+      timerEl.classList.add('text-red-200');
+    } else if (sisa <= 300) {
+      timerBox.classList.add('bg-orange-500/20', 'border-orange-300');
+    }
+
+    if (sisa <= 0) {
+      autoSubmit();
+      return;
+    }
+    sisa--;
+  }
+
+  function autoSubmit() {
+	  if (submitted) return;
+	  submitted = true;
+
+	  cbtDialog.alert(
+		'⏰ Waktu ujian telah habis!\n\nJawaban Anda akan dikirim otomatis dalam beberapa detik...',
+		'warning',
+		'Waktu Habis'
+	  );
+
+	  // Auto submit setelah 2.5 detik (beri waktu user melihat notifikasi)
+	  setTimeout(() => {
+		document.getElementById('formUjian').submit();
+	  }, 2500);
+	}
+
+  updateTimer();
+  setInterval(updateTimer, 1000);
+
+  // ============ AUTO SAVE JAWABAN ============
+  function updateCounter() {
+    const checked = document.querySelectorAll('.pilihan:checked').length;
+    document.getElementById('terjawab').textContent = checked;
+  }
+
+  document.querySelectorAll('.pilihan').forEach(radio => {
+    radio.addEventListener('change', function () {
+      const soalId = this.dataset.soal;
+      const jawaban = this.value;
+
+      // Update visual: hapus highlight semua label di soal ini
+      const parentWrapper = this.closest('label').parentElement;
+      parentWrapper.querySelectorAll('label').forEach(l => {
+        l.classList.remove('bg-green-100', 'border-green-500');
+        l.classList.add('border-green-100');
+      });
+      // Highlight label terpilih
+      this.closest('label').classList.add('bg-green-100', 'border-green-500');
+      this.closest('label').classList.remove('border-green-100');
+
+      updateCounter();
+
+      // Kirim ke server (auto-save)
+      fetch(`/siswa/ujian/{{ ujian.id }}/simpan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          soal_id: parseInt(soalId),
+          jawaban: jawaban
+        })
+      }).then(r => r.json())
+        .then(data => {
+          if (!data.ok) console.warn('⚠️ Server:', data.msg);
+        })
+        .catch(err => console.warn('Gagal simpan:', err));
+    });
+  });
+
+  updateCounter();
+
+  // ============ SUBMIT MANUAL ============
+  async function submitUjian() {
+	  const total = {{ soal_list|length }};
+	  const terjawab = document.querySelectorAll('.pilihan:checked').length;
+	  const belum = total - terjawab;
+
+	  let msg   = 'Yakin ingin menyelesaikan ujian?\n\nSetelah dikirim, jawaban tidak bisa diubah lagi.';
+	  let type  = 'question';
+	  let title = 'Konfirmasi Selesai';
+	  let okText = 'Ya, Kirim Jawaban';
+
+	  if (belum > 0) {
+		msg   = `Masih ada ${belum} soal yang BELUM dijawab!\n\nApakah Anda yakin ingin menyelesaikan ujian sekarang?`;
+		type  = 'warning';
+		title = 'Perhatian';
+		okText = 'Ya, Tetap Kirim';
+	  }
+
+	  const ok = await cbtDialog.confirm(msg, {
+		type,
+		title,
+		okText,
+		cancelText: belum > 0 ? 'Periksa Lagi' : 'Batal'
+	  });
+
+	  if (ok) {
+		submitted = true;
+		document.getElementById('formUjian').submit();
+	  }
+	}
+
+  
+  // ============ CEGAH REFRESH/CLOSE ============
+  window.addEventListener('beforeunload', function (e) {
+    if (!submitted) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+</script>
+{% include '_dialog.html' %}   <!-- ⬅️ TAMBAHKAN -->
+</body>
+</html>

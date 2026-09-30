@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Data Siswa</h1>
+<div class="grid lg:grid-cols-3 gap-6">
+  <div class="bg-white rounded-xl shadow p-6">
+    <h2 class="font-bold mb-4">{{ 'Edit' if edit else 'Tambah' }} Siswa</h2>
+    <form method="POST" class="space-y-3">
+      <input type="hidden" name="id" value="{{ edit.id if edit else '' }}">
+      <div>
+        <label class="block text-sm mb-1">NIS</label>
+        <input type="text" name="nis" required value="{{ edit.nis if edit else '' }}"
+               {{ 'readonly' if edit }}
+               class="w-full px-3 py-2 border rounded-lg">
+        {% if not edit %}
+          <p class="text-xs text-gray-500 mt-1">Username & password default = NIS</p>
+        {% endif %}
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Nama</label>
+        <input type="text" name="nama" required value="{{ edit.nama if edit else '' }}"
+               class="w-full px-3 py-2 border rounded-lg">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Kelas</label>
+        <select name="kelas_id" required class="w-full px-3 py-2 border rounded-lg">
+          <option value="">-- Pilih --</option>
+          {% for k in kelas_list %}
+            <option value="{{ k.id }}" {{ 'selected' if edit and edit.kelas_id == k.id }}>
+              {{ k.nama_kelas }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Jenis Kelamin</label>
+        <select name="jk" class="w-full px-3 py-2 border rounded-lg">
+          <option value="L" {{ 'selected' if edit and edit.jk=='L' }}>Laki-laki</option>
+          <option value="P" {{ 'selected' if edit and edit.jk=='P' }}>Perempuan</option>
+        </select>
+      </div>
+      <button class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        {{ 'Update' if edit else 'Simpan' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="lg:col-span-2 bg-white rounded-xl shadow p-6 overflow-x-auto">
+    <h2 class="font-bold mb-4">Daftar Siswa</h2>
+    <table class="w-full text-sm">
+      <thead class="bg-gray-100 text-left">
+        <tr><th class="p-3">NIS</th><th class="p-3">Nama</th>
+            <th class="p-3">Kelas</th><th class="p-3">JK</th><th class="p-3">Aksi</th></tr>
+      </thead>
+      <tbody>
+        {% for r in data %}
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-3">{{ r.nis }}</td>
+            <td class="p-3">{{ r.nama }}</td>
+            <td class="p-3">{{ r.nama_kelas or '-' }}</td>
+            <td class="p-3">{{ r.jk }}</td>
+            <td class="p-3 space-x-2">
+              <a href="{{ url_for('siswa', edit=r.id) }}" class="text-blue-600"><i class="fas fa-edit"></i></a>
+              <a href="{{ url_for('siswa_hapus', id=r.id) }}"
+			   data-confirm="Yakin ingin menghapus siswa '{{ r.nama }}' (NIS {{ r.nis }})?&#10;Akun login siswa juga akan dihapus."
+			   data-confirm-type="danger"
+			   class="text-red-600 hover:text-red-800 transition"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

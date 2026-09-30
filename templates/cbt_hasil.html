@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-lg mx-auto bg-white rounded-xl shadow p-8 text-center mt-12">
+  <i class="fas fa-trophy text-yellow-500 text-6xl mb-4"></i>
+  <h1 class="text-2xl font-bold mb-2">Ujian Selesai!</h1>
+  <p class="text-gray-500 mb-6">{{ hasil.judul }}</p>
+
+  <div class="text-6xl font-extrabold text-blue-600 mb-6">{{ hasil.nilai }}</div>
+
+  <div class="grid grid-cols-2 gap-4 text-sm mb-6">
+    <div class="bg-green-100 text-green-700 p-3 rounded-lg">
+      <p>Benar</p><p class="text-xl font-bold">{{ hasil.benar }}</p>
+    </div>
+    <div class="bg-red-100 text-red-700 p-3 rounded-lg">
+      <p>Salah</p><p class="text-xl font-bold">{{ hasil.salah }}</p>
+    </div>
+  </div>
+
+  <a href="{{ url_for('cbt_list') }}"
+     class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+    Kembali
+  </a>
+</div>
+{% endblock %}
