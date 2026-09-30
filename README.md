@@ -84,21 +84,27 @@ Dibangun dengan pendekatan **server-side rendering (SSR)** menggunakan Jinja2 te
 
 ### 🏠 Landing Page
 > Halaman utama dengan slideshow 5 gambar + statistik real-time
-
+![Landing Page](docs/screenshots/landing.png)
+> 
 ### 🔐 Login (Terpisah untuk Admin/Guru & Siswa)
 > Dua pintu masuk berbeda untuk keamanan lebih baik
+![Landing Page](docs/screenshots/login.png)
 
 ### 📊 Dashboard Admin
 > Statistik lengkap + ringkasan ujian terbaru
+![Landing Page](docs/screenshots/dashboard.png)
 
 ### 📚 Bank Soal & Import Excel
 > Input manual atau import massal dari template Excel
+![Landing Page](docs/screenshots/soal-excel.png)
 
 ### 🖥️ Ujian Siswa (Dengan Timer)
 > Timer real-time, auto-save jawaban, auto-submit
+![Landing Page](docs/screenshots/ujian.png)
 
 ### 🏆 Hasil Ujian & Review
 > Nilai instan + review jawaban dengan gambar
+![Landing Page](docs/screenshots/hasil.png)
 
 > 💡 *Tambahkan screenshot Anda sendiri di folder `docs/screenshots/`*
 
